@@ -3,15 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Form Penilaian Responden</title>
+    <title>Kuesioner Responden</title>
 
-    <!-- Bootstrap -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
 
     <style>
+
         body{
             background:#f1f3f4;
-            font-family: Arial, Helvetica, sans-serif;
+            font-family:Arial;
         }
 
         .form-container{
@@ -21,8 +22,8 @@
 
         .card-form{
             background:white;
-            border-radius:12px;
             padding:30px;
+            border-radius:10px;
             margin-bottom:20px;
             box-shadow:0 2px 8px rgba(0,0,0,0.1);
         }
@@ -32,41 +33,33 @@
         }
 
         .title{
-            font-size:30px;
+            font-size:28px;
             font-weight:bold;
-        }
-
-        .sub-title{
-            color:#666;
-            margin-top:10px;
         }
 
         .question-title{
-            font-weight:bold;
-            margin-bottom:15px;
             font-size:18px;
-        }
-
-        .radio-group label{
-            margin-right:20px;
+            font-weight:bold;
         }
 
         .required{
             color:red;
         }
 
+        .radio-group label{
+            margin-right:20px;
+        }
+
         .btn-submit{
             background:#673ab7;
             color:white;
-            padding:10px 30px;
             border:none;
+            padding:10px 30px;
             border-radius:6px;
         }
 
-        .btn-submit:hover{
-            background:#5a2ea6;
-        }
     </style>
+
 </head>
 <body>
 
@@ -74,35 +67,42 @@
 
     <!-- HEADER -->
     <div class="card-form header-form">
+
         <div class="title">
             Kuesioner Penilaian Pondok Pesantren
         </div>
 
-        <div class="sub-title">
-            Silakan isi penilaian sesuai pengalaman dan pengetahuan Anda terhadap pondok pesantren yang dipilih.
-        </div>
+        <p>
+            Silakan isi penilaian sesuai pengalaman Anda.
+        </p>
+
     </div>
 
     <!-- FORM -->
-    <form method="POST" action="simpan_penilaian.php">
+    <form method="POST"
+          action="<?= base_url('responden/simpan'); ?>">
 
-        <!-- DATA RESPONDEN -->
+        <!-- RESPONDEN -->
         <div class="card-form">
 
             <div class="form-group">
+
                 <label>
-                    Nama Responden <span class="required">*</span>
+                    Nama Responden
+                    <span class="required">*</span>
                 </label>
 
                 <input type="text"
                        name="nama_responden"
                        class="form-control"
                        required>
+
             </div>
 
             <div class="form-group">
+
                 <label>
-                    Pilih Pondok Pesantren yang Akan Dinilai
+                    Pilih Pondok Pesantren
                     <span class="required">*</span>
                 </label>
 
@@ -110,112 +110,92 @@
                         class="form-control"
                         required>
 
-                    <option value="">-- Pilih Pondok --</option>
+                    <option value="">
+                        -- Pilih Pondok --
+                    </option>
 
-                    <?php
-                    // koneksi database
-                    $conn = mysqli_connect("localhost","root","","spk_ahp_waspas_ci_3");
+                    <?php foreach($alternatif as $a){ ?>
 
-                    $alternatif = mysqli_query($conn,"SELECT * FROM alternatif");
-
-                    while($a = mysqli_fetch_assoc($alternatif)){
-                    ?>
-
-                        <option value="<?= $a['id_alternatif']; ?>">
-                            <?= $a['nama_alternatif']; ?>
+                        <option value="<?= $a->id_alternatif; ?>">
+                            <?= $a->nama_alternatif; ?>
                         </option>
 
                     <?php } ?>
 
                 </select>
+
             </div>
 
         </div>
 
-        <!-- KRITERIA & SUBKRITERIA -->
-        <?php
-
-        $kriteria = mysqli_query($conn,"
-            SELECT *
-            FROM kriteria
-            ORDER BY id_kriteria ASC
-        ");
-
-        while($k = mysqli_fetch_assoc($kriteria)){
-
-        ?>
+        <!-- KRITERIA -->
+        <?php foreach($kriteria as $k){ ?>
 
             <div class="card-form">
 
                 <div class="question-title">
-                    <?= $k['kode_kriteria']; ?> -
-                    <?= $k['nama_kriteria']; ?>
+                    <?= $k->kode_kriteria; ?> -
+                    <?= $k->nama_kriteria; ?>
                 </div>
 
-                <?php
+                <!-- PETUNJUK -->
+                <div class="mt-3 mb-3">
 
-                $id_kriteria = $k['id_kriteria'];
+                    <b>Petunjuk Penilaian:</b>
 
-                $sub = mysqli_query($conn,"
-                    SELECT *
-                    FROM sub_kriteria
-                    WHERE id_kriteria='$id_kriteria'
-                ");
+                    <ul>
 
-                while($s = mysqli_fetch_assoc($sub)){
+                        <?php foreach($sub_kriteria as $s){ ?>
 
-                ?>
+                            <?php if($s->id_kriteria == $k->id_kriteria){ ?>
 
-                    <div class="mb-4">
+                                <li>
+                                    <?= $s->nama_sub_kriteria; ?>
+                                </li>
 
-                        <label>
-                            <?= $s['nama_sub_kriteria']; ?>
-                            <span class="required">*</span>
-                        </label>
+                            <?php } ?>
 
-                        <div class="radio-group mt-2">
+                        <?php } ?>
 
-                            <label>
-                                <input type="radio"
-                                       name="nilai[<?= $id_kriteria; ?>][<?= $s['id_sub_kriteria']; ?>]"
-                                       value="1"
-                                       required>
-                                1
-                            </label>
+                    </ul>
 
-                            <label>
-                                <input type="radio"
-                                       name="nilai[<?= $id_kriteria; ?>][<?= $s['id_sub_kriteria']; ?>]"
-                                       value="2">
-                                2
-                            </label>
+                </div>
 
-                            <label>
-                                <input type="radio"
-                                       name="nilai[<?= $id_kriteria; ?>][<?= $s['id_sub_kriteria']; ?>]"
-                                       value="3">
-                                3
-                            </label>
+                <!-- NILAI -->
+                <div class="radio-group">
 
-                            <label>
-                                <input type="radio"
-                                       name="nilai[<?= $id_kriteria; ?>][<?= $s['id_sub_kriteria']; ?>]"
-                                       value="4">
-                                4
-                            </label>
+                    <label>
+                        <input type="radio"
+                               name="nilai[<?= $k->id_kriteria; ?>]"
+                               value="1"
+                               required> 1
+                    </label>
 
-                            <label>
-                                <input type="radio"
-                                       name="nilai[<?= $id_kriteria; ?>][<?= $s['id_sub_kriteria']; ?>]"
-                                       value="5">
-                                5
-                            </label>
+                    <label>
+                        <input type="radio"
+                               name="nilai[<?= $k->id_kriteria; ?>]"
+                               value="2"> 2
+                    </label>
 
-                        </div>
+                    <label>
+                        <input type="radio"
+                               name="nilai[<?= $k->id_kriteria; ?>]"
+                               value="3"> 3
+                    </label>
 
-                    </div>
+                    <label>
+                        <input type="radio"
+                               name="nilai[<?= $k->id_kriteria; ?>]"
+                               value="4"> 4
+                    </label>
 
-                <?php } ?>
+                    <label>
+                        <input type="radio"
+                               name="nilai[<?= $k->id_kriteria; ?>]"
+                               value="5"> 5
+                    </label>
+
+                </div>
 
             </div>
 
@@ -223,9 +203,14 @@
 
         <!-- BUTTON -->
         <div class="text-center mb-5">
-            <button type="submit" class="btn-submit">
+
+            <button type="submit"
+                    class="btn-submit">
+
                 Kirim Penilaian
+
             </button>
+
         </div>
 
     </form>
