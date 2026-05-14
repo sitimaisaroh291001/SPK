@@ -117,7 +117,7 @@
                     <?php foreach($alternatif as $a){ ?>
 
                         <option value="<?= $a->id_alternatif; ?>">
-                            <?= $a->nama_alternatif; ?>
+                            <?= $a->nama; ?>
                         </option>
 
                     <?php } ?>
@@ -135,7 +135,7 @@
 
                 <div class="question-title">
                     <?= $k->kode_kriteria; ?> -
-                    <?= $k->nama_kriteria; ?>
+                    <?= $k->keterangan; ?>
                 </div>
 
                 <!-- PETUNJUK -->
@@ -150,7 +150,7 @@
                             <?php if($s->id_kriteria == $k->id_kriteria){ ?>
 
                                 <li>
-                                    <?= $s->nama_sub_kriteria; ?>
+                                    <?= $s->deskripsi; ?> (Nilai: <?= $s->nilai; ?>)
                                 </li>
 
                             <?php } ?>
@@ -164,36 +164,21 @@
                 <!-- NILAI -->
                 <div class="radio-group">
 
-                    <label>
-                        <input type="radio"
-                               name="nilai[<?= $k->id_kriteria; ?>]"
-                               value="1"
-                               required> 1
-                    </label>
+                    <?php foreach($sub_kriteria as $s){ ?>
 
-                    <label>
-                        <input type="radio"
-                               name="nilai[<?= $k->id_kriteria; ?>]"
-                               value="2"> 2
-                    </label>
+                        <?php if($s->id_kriteria == $k->id_kriteria){ ?>
 
-                    <label>
-                        <input type="radio"
-                               name="nilai[<?= $k->id_kriteria; ?>]"
-                               value="3"> 3
-                    </label>
+                            <label>
+                                <input type="radio"
+                                       name="nilai[<?= $k->id_kriteria; ?>]"
+                                       value="<?= $s->id_sub_kriteria; ?>"
+                                       required>
+                                <?= $s->nilai; ?>
+                            </label>
 
-                    <label>
-                        <input type="radio"
-                               name="nilai[<?= $k->id_kriteria; ?>]"
-                               value="4"> 4
-                    </label>
+                        <?php } ?>
 
-                    <label>
-                        <input type="radio"
-                               name="nilai[<?= $k->id_kriteria; ?>]"
-                               value="5"> 5
-                    </label>
+                    <?php } ?>
 
                 </div>
 
