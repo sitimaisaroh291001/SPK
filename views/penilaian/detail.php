@@ -53,27 +53,7 @@
 
                     <?php
                     $no = 1;
-
-                    $total_a = 0;
-                    $total_b = 0;
-                    $total_c = 0;
-                    $total_d = 0;
-                    $total_e = 0;
-                    $total_f = 0;
-                    $total_g = 0;
-
-                    $jumlah = count($detail);
-
                     foreach($detail as $d):
-
-                    $total_a += $d->nilai_a;
-                    $total_b += $d->nilai_b;
-                    $total_c += $d->nilai_c;
-                    $total_d += $d->nilai_d;
-                    $total_e += $d->nilai_e;
-                    $total_f += $d->nilai_f;
-                    $total_g += $d->nilai_g;
-
                     ?>
 
                     <tr align="center">
@@ -107,40 +87,18 @@
                     <tr align="center">
 
                         <td colspan="2">
-                            Rata-rata
+                            Modus
                         </td>
 
-                        <td>
-                            <?= ($jumlah > 0) ? round($total_a / $jumlah, 2) : 0 ?>
-                        </td>
+                        <td><?= $modus['nilai_a'] ?></td>
+                        <td><?= $modus['nilai_b'] ?></td>
+                        <td><?= $modus['nilai_c'] ?></td>
+                        <td><?= $modus['nilai_d'] ?></td>
+                        <td><?= $modus['nilai_e'] ?></td>
+                        <td><?= $modus['nilai_f'] ?></td>
+                        <td><?= $modus['nilai_g'] ?></td>
 
-                        <td>
-                            <?= ($jumlah > 0) ? round($total_b / $jumlah, 2) : 0 ?>
-                        </td>
-
-                        <td>
-                            <?= ($jumlah > 0) ? round($total_c / $jumlah, 2) : 0 ?>
-                        </td>
-
-                        <td>
-                            <?= ($jumlah > 0) ? round($total_d / $jumlah, 2) : 0 ?>
-                        </td>
-
-                        <td>
-                            <?= ($jumlah > 0) ? round($total_e / $jumlah, 2) : 0 ?>
-                        </td>
-
-                        <td>
-                            <?= ($jumlah > 0) ? round($total_f / $jumlah, 2) : 0 ?>
-                        </td>
-
-                        <td>
-                            <?= ($jumlah > 0) ? round($total_g / $jumlah, 2) : 0 ?>
-                        </td>
-
-                        <td>
-                            -
-                        </td>
+                        <td>-</td>
 
                     </tr>
 

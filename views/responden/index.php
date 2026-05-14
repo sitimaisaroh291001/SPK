@@ -48,6 +48,7 @@
 
         .radio-group label{
             margin-right:20px;
+            font-weight:bold;
         }
 
         .btn-submit{
@@ -56,6 +57,13 @@
             border:none;
             padding:10px 30px;
             border-radius:6px;
+        }
+
+        .question-box{
+            background:#f8f9fa;
+            border-left:5px solid #673ab7;
+            padding:15px;
+            border-radius:5px;
         }
 
     </style>
@@ -73,7 +81,7 @@
         </div>
 
         <p>
-            Silakan isi penilaian sesuai pengalaman Anda.
+            Silakan isi penilaian sesuai pengalaman dan pengetahuan Anda terhadap pondok pesantren yang dipilih.
         </p>
 
     </div>
@@ -128,14 +136,48 @@
 
         </div>
 
+        <?php
+
+        $pertanyaan = [
+
+            'A' => 'Bagaimana sistem hafalan Al-Qur’an di pondok pesantren ini menurut Anda?',
+
+            'B' => 'Bagaimana kualitas pengajar tahfidz di pondok pesantren ini?',
+
+            'C' => 'Bagaimana pembinaan karakter dan akhlak santri di pondok pesantren ini?',
+
+            'D' => 'Bagaimana integrasi ilmu umum dengan kurikulum pesantren?',
+
+            'E' => 'Bagaimana fasilitas pendukung yang tersedia di pondok pesantren ini?',
+
+            'F' => 'Bagaimana kondisi lingkungan pondok pesantren menurut Anda?',
+
+            'G' => 'Bagaimana kualitas alumni pondok pesantren ini menurut Anda?',
+
+        ];
+
+        ?>
+
         <!-- KRITERIA -->
         <?php foreach($kriteria as $k){ ?>
 
             <div class="card-form">
 
+                <!-- JUDUL -->
                 <div class="question-title">
+
                     <?= $k->kode_kriteria; ?> -
                     <?= $k->keterangan; ?>
+
+                </div>
+
+                <!-- PERTANYAAN -->
+                <div class="question-box mt-3 mb-3">
+
+                    <b>Pertanyaan:</b><br>
+
+                    <?= $pertanyaan[$k->kode_kriteria]; ?>
+
                 </div>
 
                 <!-- PETUNJUK -->
@@ -150,7 +192,8 @@
                             <?php if($s->id_kriteria == $k->id_kriteria){ ?>
 
                                 <li>
-                                    <?= $s->deskripsi; ?> (Nilai: <?= $s->nilai; ?>)
+                                    <?= $s->deskripsi; ?>
+                                    (Nilai: <?= $s->nilai; ?>)
                                 </li>
 
                             <?php } ?>
@@ -161,7 +204,7 @@
 
                 </div>
 
-                <!-- NILAI -->
+                <!-- PILIHAN NILAI -->
                 <div class="radio-group">
 
                     <?php foreach($sub_kriteria as $s){ ?>
@@ -169,11 +212,14 @@
                         <?php if($s->id_kriteria == $k->id_kriteria){ ?>
 
                             <label>
+
                                 <input type="radio"
                                        name="nilai[<?= $k->id_kriteria; ?>]"
                                        value="<?= $s->id_sub_kriteria; ?>"
                                        required>
+
                                 <?= $s->nilai; ?>
+
                             </label>
 
                         <?php } ?>
