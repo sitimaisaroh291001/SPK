@@ -1,8 +1,12 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
     <title>Kuesioner Responden</title>
 
     <link rel="stylesheet"
@@ -66,9 +70,14 @@
             border-radius:5px;
         }
 
+        .nilai-box{
+            margin-top:15px;
+        }
+
     </style>
 
 </head>
+
 <body>
 
 <div class="container form-container">
@@ -90,7 +99,7 @@
     <form method="POST"
           action="<?= base_url('responden/simpan'); ?>">
 
-        <!-- RESPONDEN -->
+        <!-- DATA RESPONDEN -->
         <div class="card-form">
 
             <div class="form-group">
@@ -166,7 +175,8 @@
                 <!-- JUDUL -->
                 <div class="question-title">
 
-                    <?= $k->kode_kriteria; ?> -
+                    <?= $k->kode_kriteria; ?>
+                    -
                     <?= $k->keterangan; ?>
 
                 </div>
@@ -174,7 +184,9 @@
                 <!-- PERTANYAAN -->
                 <div class="question-box mt-3 mb-3">
 
-                    <b>Pertanyaan:</b><br>
+                    <b>Pertanyaan:</b>
+
+                    <br>
 
                     <?= $pertanyaan[$k->kode_kriteria]; ?>
 
@@ -192,8 +204,12 @@
                             <?php if($s->id_kriteria == $k->id_kriteria){ ?>
 
                                 <li>
+
                                     <?= $s->deskripsi; ?>
-                                    (Nilai: <?= $s->nilai; ?>)
+
+                                    (Nilai:
+                                    <?= $s->nilai; ?>)
+
                                 </li>
 
                             <?php } ?>
@@ -205,7 +221,7 @@
                 </div>
 
                 <!-- PILIHAN NILAI -->
-                <div class="radio-group">
+                <div class="radio-group nilai-box">
 
                     <?php foreach($sub_kriteria as $s){ ?>
 
@@ -214,8 +230,11 @@
                             <label>
 
                                 <input type="radio"
-                                       name="nilai[<?= $k->id_kriteria; ?>]"
-                                       value="<?= $s->id_sub_kriteria; ?>"
+
+                                       name="nilai[<?= $k->kode_kriteria; ?>]"
+
+                                       value="<?= $s->nilai; ?>"
+
                                        required>
 
                                 <?= $s->nilai; ?>

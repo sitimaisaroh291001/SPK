@@ -1,58 +1,147 @@
 <?php
+
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Responden extends CI_Controller {
 
-    // halaman form
+    public function __construct()
+    {
+        parent::__construct();
+
+        $this->load->database();
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | HALAMAN FORM KUESIONER
+    |--------------------------------------------------------------------------
+    */
+
     public function index()
     {
-        // ambil alternatif
-        $data['alternatif'] = $this->db
-            ->get('alternatif')
-            ->result();
 
-        // ambil kriteria
-        $data['kriteria'] = $this->db
-            ->get('kriteria')
-            ->result();
+        $data['alternatif'] =
+        $this->db->get('alternatif')->result();
 
-        // ambil sub kriteria
-        $data['sub_kriteria'] = $this->db
-            ->get('sub_kriteria')
-            ->result();
+        $data['kriteria'] =
+        $this->db->get('kriteria')->result();
 
-        // tampilkan view
-        $this->load->view('responden/index', $data);
+        $data['sub_kriteria'] =
+        $this->db->get('sub_kriteria')->result();
+
+        $this->load->view(
+            'responden/index',
+            $data
+        );
     }
 
-    // proses simpan penilaian
+    /*
+    |--------------------------------------------------------------------------
+    | SIMPAN DATA RESPONDEN
+    |--------------------------------------------------------------------------
+    */
+
     public function simpan()
     {
-        $nama = $this->input->post('nama_responden');
-        $id_alternatif = $this->input->post('id_alternatif');
+
         $nilai = $this->input->post('nilai');
 
-        // simpan responden
-        $this->db->insert('responden', [
-            'nama_responden' => $nama,
-            'asal_alternatif' => $id_alternatif
-        ]);
+        $data = [
 
-        $id_responden = $this->db->insert_id();
+            'nama_responden' =>
+            $this->input->post('nama_responden'),
 
-        // simpan penilaian
-        foreach($nilai as $id_kriteria => $v){
+            'asal_alternatif' =>
+            $this->input->post('id_alternatif'),
 
-            $this->db->insert('penilaian', [
-                'id_responden' => $id_responden,
-                'id_alternatif' => $id_alternatif,
-                'id_kriteria' => $id_kriteria,
-                'nilai' => $v
-            ]);
+            /*
+            |--------------------------------------------------------------------------
+            | NILAI KRITERIA
+            |--------------------------------------------------------------------------
+            | Menggunakan kode kriteria A-G
+            */
 
-        }
+            'nilai_a' =>
+            isset($nilai['A']) ? $nilai['A'] : 0,
 
-        redirect('responden');
+            'nilai_b' =>
+            isset($nilai['B']) ? $nilai['B'] : 0,
+
+            'nilai_c' =>
+            isset($nilai['C']) ? $nilai['C'] : 0,
+
+            'nilai_d' =>
+            isset($nilai['D']) ? $nilai['D'] : 0,
+
+            'nilai_e' =>
+            isset($nilai['E']) ? $nilai['E'] : 0,
+
+            'nilai_f' =>
+            isset($nilai['F']) ? $nilai['F'] : 0,
+
+            'nilai_g' =>
+            isset($nilai['G']) ? $nilai['G'] : 0,
+
+        ];
+
+        /*
+        |--------------------------------------------------------------------------
+        | INSERT KE DATABASE
+        |--------------------------------------------------------------------------
+        */
+
+        $this->db->insert(
+            'responden',
+            $data
+        );
+
+        /*
+        |--------------------------------------------------------------------------
+        | REDIRECT
+        |--------------------------------------------------------------------------
+        */
+
+        redirect('responden/sukses');
     }
 
+    /*
+    |--------------------------------------------------------------------------
+    | HALAMAN SUKSES
+    |--------------------------------------------------------------------------
+    */
+
+    public function sukses()
+    {
+
+        echo "
+
+        <div style='
+            margin-top:100px;
+            text-align:center;
+            font-family:Arial;
+        '>
+
+            <h2>
+                Penilaian berhasil dikirim
+            </h2>
+
+            <br>
+
+            <a href='".base_url('responden')."'
+               style='
+               background:#28a745;
+               color:white;
+               padding:10px 20px;
+               text-decoration:none;
+               border-radius:5px;
+               '>
+
+               Kembali
+
+            </a>
+
+        </div>
+
+        ";
+    }
 }
