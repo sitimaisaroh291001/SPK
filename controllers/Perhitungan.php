@@ -1,5 +1,4 @@
 <?php
-
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Perhitungan extends CI_Controller {
@@ -8,225 +7,264 @@ class Perhitungan extends CI_Controller {
     {
         parent::__construct();
 
+        $this->load->library('pagination');
+        $this->load->library('form_validation');
+
         $this->load->model('Perhitungan_model');
     }
 
-    /*
-    =========================================
-    HALAMAN PERHITUNGAN
-    =========================================
-    */
-
+    // =========================================
+    // HALAMAN PERHITUNGAN
+    // =========================================
     public function index()
     {
+        if ($this->session->userdata('id_user_level') != "1") {
+
+            ?>
+            <script type="text/javascript">
+                alert('Anda tidak berhak mengakses halaman ini!');
+                window.location='<?php echo base_url("Login/home"); ?>'
+            </script>
+            <?php
+        }
+
         $data = [
-            'page'       => 'Perhitungan',
+
+            'page'       => "Perhitungan",
+
             'kriteria'   => $this->Perhitungan_model->get_kriteria(),
-            'alternatif' => $this->Perhitungan_model->get_alternatif()
+
+            'alternatif' => $this->Perhitungan_model->get_alternatif(),
         ];
 
-        $this->load->view('perhitungan/perhitungan', $data);
+        $this->load->view(
+            'Perhitungan/perhitungan',
+            $data
+        );
     }
 
-    /*
-    =========================================
-    HASIL
-    =========================================
-    */
-
+    // =========================================
+    // HALAMAN HASIL
+    // =========================================
     public function hasil()
     {
         $data = [
-            'page'  => 'Hasil',
+
+            'page'  => "Hasil",
+
             'hasil' => $this->Perhitungan_model->get_hasil()
         ];
 
-        $this->load->view('perhitungan/hasil', $data);
+        $this->load->view(
+            'Perhitungan/hasil',
+            $data
+        );
     }
 
-    /*
-    =========================================
-    SENSITIVITY ANALYSIS
-    =========================================
-    */
-
+    // =========================================
+    // SENSITIVITY ANALYSIS
+    // =========================================
     public function sensitivity()
     {
-
         $kriteria   = $this->Perhitungan_model->get_kriteria();
+
         $alternatif = $this->Perhitungan_model->get_alternatif();
 
-        /*
-        ==========================
-        BOBOT AWAL
-        ==========================
-        */
+        // =====================================
+        // KRITERIA UTAMA
+        // =====================================
+        $kriteria_utama = $kriteria[0];
 
+        // =====================================
+        // BOBOT AWAL
+        // =====================================
         $bobot_awal = [];
 
-        foreach($kriteria as $k){
+        foreach ($kriteria as $k) {
 
             $bobot_awal[$k->id_kriteria] = $k->bobot;
-
         }
 
-        /*
-        ==========================
-        +10%
-        ==========================
-        */
-
+        // =====================================
+        // BOBOT +10%
+        // =====================================
         $bobot_plus = $bobot_awal;
 
-        $id_utama = $kriteria[0]->id_kriteria;
-
-        $bobot_plus[$id_utama] =
-            $bobot_plus[$id_utama] * 1.1;
+        $bobot_plus[$kriteria_utama->id_kriteria] =
+            $bobot_plus[$kriteria_utama->id_kriteria] * 1.1;
 
         $total_plus = array_sum($bobot_plus);
 
-        foreach($bobot_plus as $id => $b){
+        foreach ($bobot_plus as $id => $b) {
 
             $bobot_plus[$id] = $b / $total_plus;
-
         }
 
-        /*
-        ==========================
-        -10%
-        ==========================
-        */
-
+        // =====================================
+        // BOBOT -10%
+        // =====================================
         $bobot_minus = $bobot_awal;
 
-        $bobot_minus[$id_utama] =
-            $bobot_minus[$id_utama] * 0.9;
+        $bobot_minus[$kriteria_utama->id_kriteria] =
+            $bobot_minus[$kriteria_utama->id_kriteria] * 0.9;
 
         $total_minus = array_sum($bobot_minus);
 
-        foreach($bobot_minus as $id => $b){
+        foreach ($bobot_minus as $id => $b) {
 
             $bobot_minus[$id] = $b / $total_minus;
-
         }
 
-        /*
-        ==========================
-        HITUNG
-        ==========================
-        */
-
+        // =====================================
+        // ARRAY HASIL
+        // =====================================
         $hasil_awal  = [];
+
         $hasil_plus  = [];
+
         $hasil_minus = [];
 
-        foreach($alternatif as $a){
+        // =====================================
+        // PERHITUNGAN
+        // =====================================
+        foreach ($alternatif as $alt) {
 
-            $qi_awal  = 0;
-            $qi_plus  = 0;
-            $qi_minus = 0;
+            // =================================
+            // AMBIL QI AWAL
+            // =================================
+            $hasil_db = $this->db
+                ->where('id_alternatif', $alt->id_alternatif)
+                ->get('hasil')
+                ->row();
 
-            foreach($kriteria as $k){
+            $qi_awal = $hasil_db ? $hasil_db->nilai : 0;
 
-                $nilai =
-                    $this->Perhitungan_model
+            // =================================
+            // VARIABEL WASPAS
+            // =================================
+            $ta_plus  = 0;
+            $pa_plus  = 1;
+
+            $ta_minus = 0;
+            $pa_minus = 1;
+
+            // =================================
+            // LOOP KRITERIA
+            // =================================
+            foreach ($kriteria as $k) {
+
+                $nilai = $this->Perhitungan_model
                     ->data_nilai(
-                        $a->id_alternatif,
+                        $alt->id_alternatif,
                         $k->id_kriteria
                     );
 
-                $minmax =
-                    $this->Perhitungan_model
+                $minmax = $this->Perhitungan_model
                     ->get_max_min($k->id_kriteria);
 
-                if(!$nilai){
-                    continue;
+                // =============================
+                // NORMALISASI
+                // =============================
+                if ($minmax['jenis'] == 'Benefit') {
+
+                    $r =
+                        $nilai['nilai'] /
+                        $minmax['max'];
+
+                } else {
+
+                    $r =
+                        $minmax['min'] /
+                        $nilai['nilai'];
                 }
 
-                $x = $nilai['nilai'];
-
-                if($minmax['jenis'] == 'Benefit'){
-
-                    $r = $x / $minmax['max'];
-
-                }else{
-
-                    $r = $minmax['min'] / $x;
-
-                }
-
-                /*
-                AWAL
-                */
-
-                $qi_awal +=
-                    $r *
-                    $bobot_awal[$k->id_kriteria];
-
-                /*
-                PLUS
-                */
-
-                $qi_plus +=
+                // =============================
+                // +10%
+                // =============================
+                $ta_plus +=
                     $r *
                     $bobot_plus[$k->id_kriteria];
 
-                /*
-                MINUS
-                */
+                $pa_plus *=
+                    pow(
+                        $r,
+                        $bobot_plus[$k->id_kriteria]
+                    );
 
-                $qi_minus +=
+                // =============================
+                // -10%
+                // =============================
+                $ta_minus +=
                     $r *
                     $bobot_minus[$k->id_kriteria];
 
+                $pa_minus *=
+                    pow(
+                        $r,
+                        $bobot_minus[$k->id_kriteria]
+                    );
             }
 
+            // =================================
+            // HITUNG QI
+            // =================================
+            $qi_plus =
+                (0.5 * $ta_plus) +
+                (0.5 * $pa_plus);
+
+            $qi_minus =
+                (0.5 * $ta_minus) +
+                (0.5 * $pa_minus);
+
+            // =================================
+            // SIMPAN HASIL
+            // =================================
             $hasil_awal[] = [
-                'nama'  => $a->nama,
+
+                'nama'  => $alt->nama,
+
                 'nilai' => $qi_awal
             ];
 
             $hasil_plus[] = [
-                'nama'  => $a->nama,
+
+                'nama'  => $alt->nama,
+
                 'nilai' => $qi_plus
             ];
 
             $hasil_minus[] = [
-                'nama'  => $a->nama,
+
+                'nama'  => $alt->nama,
+
                 'nilai' => $qi_minus
             ];
         }
 
-        /*
-        ==========================
-        SORTING
-        ==========================
-        */
-
-        usort($hasil_awal, function($a,$b){
+        // =====================================
+        // SORTING DESC
+        // =====================================
+        usort($hasil_awal, function($a, $b){
 
             return $b['nilai'] <=> $a['nilai'];
 
         });
 
-        usort($hasil_plus, function($a,$b){
+        usort($hasil_plus, function($a, $b){
 
             return $b['nilai'] <=> $a['nilai'];
 
         });
 
-        usort($hasil_minus, function($a,$b){
+        usort($hasil_minus, function($a, $b){
 
             return $b['nilai'] <=> $a['nilai'];
 
         });
 
-        /*
-        ==========================
-        KIRIM DATA
-        ==========================
-        */
-
+        // =====================================
+        // KIRIM DATA
+        // =====================================
         $data = [
 
             'page'         => 'Sensitivity',
@@ -236,11 +274,10 @@ class Perhitungan extends CI_Controller {
             'hasil_plus'   => $hasil_plus,
 
             'hasil_minus'  => $hasil_minus
-
         ];
 
         $this->load->view(
-            'perhitungan/sensitivity',
+            'Perhitungan/sensitivity',
             $data
         );
     }
