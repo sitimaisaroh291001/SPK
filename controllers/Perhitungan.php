@@ -13,23 +13,14 @@ class Perhitungan extends CI_Controller {
         $this->load->model('Perhitungan_model');
     }
 
-    // =========================================
+
+    // =====================================
     // HALAMAN PERHITUNGAN
-    // =========================================
+    // =====================================
 
     public function index()
     {
-        if ($this->session->userdata('id_user_level') != "1") {
-
-            ?>
-            <script>
-            alert('Anda tidak berhak mengakses halaman ini!');
-            window.location='<?php echo base_url("Login/home");?>'
-            </script>
-            <?php
-        }
-
-        $data=[
+        $data = [
 
             'page'=>"Perhitungan",
 
@@ -50,16 +41,17 @@ class Perhitungan extends CI_Controller {
     }
 
 
-    // =========================================
+
+    // =====================================
     // HALAMAN HASIL
-    // =========================================
+    // =====================================
 
     public function hasil()
     {
 
         $data=[
 
-            'page'=>"Hasil",
+            'page'=>'Hasil',
 
             'hasil'=>
             $this->Perhitungan_model
@@ -76,16 +68,22 @@ class Perhitungan extends CI_Controller {
 
 
 
-    // =========================================
-    // SENSITIVITY ANALYSIS
-    // =========================================
+    // =====================================
+    // SENSITIVITY
+    // =====================================
 
     public function sensitivity()
     {
 
+        $hasil_awal=
+        $this->Perhitungan_model
+        ->get_hasil();
+
+
         $kriteria=
         $this->Perhitungan_model
         ->get_kriteria();
+
 
         $alternatif=
         $this->Perhitungan_model
@@ -93,18 +91,12 @@ class Perhitungan extends CI_Controller {
 
 
 
-        // =====================================
-        // AMBIL BOBOT AWAL
-        // =====================================
+        $bobot=[];
 
-        $bobot_awal=[];
+        foreach($kriteria as $k){
 
-        foreach(
-            $kriteria as $k
-        ){
-
-            $bobot_awal[
-            $k->id_kriteria
+            $bobot[
+                $k->id_kriteria
             ]
             =
             $k->bobot;
@@ -113,106 +105,39 @@ class Perhitungan extends CI_Controller {
 
 
 
-        // =====================================
-        // CARI BOBOT TERBESAR
-        // =====================================
+        // +10% semua bobot
 
-        $bobot_max=0;
-
-        $kriteria_utama=null;
+        $bobot_plus=[];
 
         foreach(
-            $kriteria as $k
-        ){
-
-            if(
-                $k->bobot
-                >
-                $bobot_max
-            ){
-
-                $bobot_max=
-                $k->bobot;
-
-                $kriteria_utama=
-                $k;
-
-            }
-
-        }
-
-
-
-        // =====================================
-        // +10%
-        // =====================================
-
-        $bobot_plus=
-        $bobot_awal;
-
-        $bobot_plus[
-        $kriteria_utama->id_kriteria
-        ]
-        *=1.1;
-
-
-        $total_plus=
-        array_sum(
-            $bobot_plus
-        );
-
-
-        foreach(
-        $bobot_plus as
-        $id=>$b
+            $bobot as
+            $id=>$nilai
         ){
 
             $bobot_plus[$id]
             =
-            $b/$total_plus;
+            $nilai*1.1;
 
         }
 
 
 
-        // =====================================
-        // -10%
-        // =====================================
+        // -10% semua bobot
 
-        $bobot_minus=
-        $bobot_awal;
-
-
-        $bobot_minus[
-        $kriteria_utama->id_kriteria
-        ]
-        *=0.9;
-
-
-        $total_minus=
-        array_sum(
-        $bobot_minus
-        );
-
+        $bobot_minus=[];
 
         foreach(
-        $bobot_minus as
-        $id=>$b
+            $bobot as
+            $id=>$nilai
         ){
 
             $bobot_minus[$id]
             =
-            $b/$total_minus;
+            $nilai*0.9;
 
         }
 
 
-
-        // =====================================
-        // ARRAY HASIL
-        // =====================================
-
-        $hasil_awal=[];
 
         $hasil_plus=[];
 
@@ -220,43 +145,9 @@ class Perhitungan extends CI_Controller {
 
 
 
-        // =====================================
-        // HITUNG
-        // =====================================
-
         foreach(
             $alternatif as $alt
         ){
-
-
-            // ==============================
-            // HASIL AWAL
-            // ==============================
-
-            $hasil_db=
-            $this->db
-            ->where(
-                'id_alternatif',
-                $alt->id_alternatif
-            )
-            ->get(
-                'hasil'
-            )
-            ->row();
-
-
-            $qi_awal=
-            $hasil_db
-            ?
-            $hasil_db->nilai
-            :
-            0;
-
-
-
-            // ==============================
-            // WASPAS
-            // ==============================
 
             $ta_plus=0;
             $pa_plus=1;
@@ -267,40 +158,28 @@ class Perhitungan extends CI_Controller {
 
 
             foreach(
-            $kriteria as $k
+                $kriteria as $k
             ){
 
                 $nilai=
-                $this
-                ->Perhitungan_model
+                $this->Perhitungan_model
                 ->data_nilai(
-
                     $alt->id_alternatif,
-
                     $k->id_kriteria
-
                 );
+
 
 
                 $minmax=
-                $this
-                ->Perhitungan_model
+                $this->Perhitungan_model
                 ->get_max_min(
-
                     $k->id_kriteria
-
                 );
 
 
 
-                // =====================
-                // NORMALISASI
-                // =====================
-
                 if(
-                $minmax['jenis']
-                ==
-                'Benefit'
+                    $k->jenis=="Benefit"
                 ){
 
                     $r=
@@ -309,7 +188,6 @@ class Perhitungan extends CI_Controller {
                     $minmax['max'];
 
                 }
-
                 else{
 
                     $r=
@@ -320,105 +198,65 @@ class Perhitungan extends CI_Controller {
                 }
 
 
+                $r=round($r,4);
 
-                // =====================
-                // +10%
-                // =====================
+
 
                 $ta_plus +=
-                (
-                $r
-                *
+                $r*
                 $bobot_plus[
-                $k->id_kriteria
-                ]
-                );
+                    $k->id_kriteria
+                ];
+
 
 
                 $pa_plus *=
                 pow(
-
-                $r,
-
-                $bobot_plus[
-                $k->id_kriteria
-                ]
-
+                    $r,
+                    $bobot_plus[
+                    $k->id_kriteria
+                    ]
                 );
 
 
-
-                // =====================
-                // -10%
-                // =====================
 
                 $ta_minus +=
-                (
-                $r
-                *
+                $r*
                 $bobot_minus[
-                $k->id_kriteria
-                ]
-                );
+                    $k->id_kriteria
+                ];
+
 
 
                 $pa_minus *=
                 pow(
-
-                $r,
-
-                $bobot_minus[
-                $k->id_kriteria
-                ]
-
+                    $r,
+                    $bobot_minus[
+                    $k->id_kriteria
+                    ]
                 );
 
             }
 
 
 
-            // =====================
-            // QI
-            // =====================
-
             $qi_plus=
-            (
-                0.5
-                *
-                $ta_plus
-            )
+            round(
+            (0.5*$ta_plus)
             +
-            (
-                0.5
-                *
-                $pa_plus
+            (0.5*$pa_plus),
+            6
             );
+
 
 
             $qi_minus=
-            (
-                0.5
-                *
-                $ta_minus
-            )
+            round(
+            (0.5*$ta_minus)
             +
-            (
-                0.5
-                *
-                $pa_minus
+            (0.5*$pa_minus),
+            6
             );
-
-
-
-            $hasil_awal[]=[
-
-                'nama'=>
-                $alt->nama,
-
-                'nilai'=>
-                $qi_awal
-
-            ];
 
 
 
@@ -449,60 +287,44 @@ class Perhitungan extends CI_Controller {
 
 
         usort(
-        $hasil_awal,
-        function($a,$b){
+            $hasil_plus,
+            function($a,$b){
 
-            return
-            $b['nilai']
-            <=>
-            $a['nilai'];
+                return
+                $b['nilai']
+                <=>
+                $a['nilai'];
 
-        });
-
-
-        usort(
-        $hasil_plus,
-        function($a,$b){
-
-            return
-            $b['nilai']
-            <=>
-            $a['nilai'];
-
-        });
+            }
+        );
 
 
         usort(
-        $hasil_minus,
-        function($a,$b){
+            $hasil_minus,
+            function($a,$b){
 
-            return
-            $b['nilai']
-            <=>
-            $a['nilai'];
+                return
+                $b['nilai']
+                <=>
+                $a['nilai'];
 
-        });
+            }
+        );
 
 
-
-        // =====================
-        // VIEW
-        // =====================
 
         $data=[
 
             'page'=>'Sensitivity',
 
-            'hasil_awal'=>
-            $hasil_awal,
+            'hasil_awal'=>$hasil_awal,
 
-            'hasil_plus'=>
-            $hasil_plus,
+            'hasil_plus'=>$hasil_plus,
 
-            'hasil_minus'=>
-            $hasil_minus
+            'hasil_minus'=>$hasil_minus
 
         ];
+
 
 
         $this->load->view(
