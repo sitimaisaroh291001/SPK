@@ -2,243 +2,262 @@
 
 <div class="d-sm-flex align-items-center justify-content-between mb-4">
 
-    <h1 class="h3 mb-0 text-gray-800">
-        <i class="fas fa-chart-line"></i>
-        Sensitivity Analysis
-    </h1>
+<h1 class="h3 mb-0 text-gray-800">
+<i class="fas fa-chart-line"></i>
+Sensitivity Analysis
+</h1>
 
 </div>
 
 <div class="card shadow mb-4">
 
-    <div class="card-header py-3">
+<div class="card-header py-3">
 
-        <h6 class="m-0 font-weight-bold text-dark">
-            Hasil Sensitivity Analysis ±10%
-        </h6>
+<h6 class="m-0 font-weight-bold text-dark">
+Hasil Sensitivity Analysis ±10%
+</h6>
 
-    </div>
+</div>
 
-    <div class="card-body">
+<div class="card-body">
 
-        <div class="alert alert-info text-justify">
+<div class="alert alert-info">
 
-            Sensitivity Analysis dilakukan dengan
-            menaikkan dan menurunkan bobot
-            kriteria utama sebesar ±10%
-            untuk menguji stabilitas hasil
-            perangkingan metode Hybrid
-            AHP-WASPAS.
+Sensitivity Analysis dilakukan dengan
+menaikkan dan menurunkan bobot
+kriteria utama sebesar ±10%
+untuk menguji stabilitas hasil
+perangkingan Hybrid AHP-WASPAS.
 
-        </div>
+</div>
 
-        <div class="table-responsive">
+<div class="table-responsive">
 
-            <table class="table table-bordered table-striped">
+<table class="table table-bordered table-striped">
 
-                <thead class="bg-dark text-white">
+<thead class="bg-dark text-white">
 
-                    <tr align="center">
+<tr align="center">
 
-                        <th width="5%">No</th>
+<th>No</th>
 
-                        <th>Alternatif</th>
+<th>Alternatif</th>
 
-                        <th width="12%">
-                            Qi Awal
-                        </th>
+<th>Qi Awal</th>
 
-                        <th width="12%">
-                            Ranking Awal
-                        </th>
+<th>Rank Awal</th>
 
-                        <th width="12%">
-                            Qi +10%
-                        </th>
+<th>Qi +10%</th>
 
-                        <th width="12%">
-                            Ranking +10%
-                        </th>
+<th>Rank +10%</th>
 
-                        <th width="12%">
-                            Qi -10%
-                        </th>
+<th>Qi -10%</th>
 
-                        <th width="12%">
-                            Ranking -10%
-                        </th>
+<th>Rank -10%</th>
 
-                    </tr>
+</tr>
 
-                </thead>
+</thead>
 
-                <tbody>
+<tbody>
 
-                    <?php
-                    $no = 1;
+<?php
 
-                    // =========================
-                    // SORTING RANKING +10%
-                    // =========================
-                    $rank_plus = $hasil_plus;
+$no=1;
 
-                    usort($rank_plus, function($a, $b){
-                        return $b['nilai'] <=> $a['nilai'];
-                    });
 
-                    // =========================
-                    // SORTING RANKING -10%
-                    // =========================
-                    $rank_minus = $hasil_minus;
+// buat mapping ranking
 
-                    usort($rank_minus, function($a, $b){
-                        return $b['nilai'] <=> $a['nilai'];
-                    });
+$rank_awal=[];
 
-                    foreach($hasil_awal as $i => $h):
+foreach($hasil_awal as $i=>$r){
 
-                        // ranking awal
-                        $ranking_awal = $i + 1;
+$rank_awal[
+$r['nama']
+]=$i+1;
 
-                        // ranking +10%
-                        $ranking_plus = 0;
+}
 
-                        foreach($rank_plus as $rp => $r){
-                            if($r['nama'] == $hasil_plus[$i]['nama']){
-                                $ranking_plus = $rp + 1;
-                            }
-                        }
 
-                        // ranking -10%
-                        $ranking_minus = 0;
+$rank_plus=[];
 
-                        foreach($rank_minus as $rm => $r2){
-                            if($r2['nama'] == $hasil_minus[$i]['nama']){
-                                $ranking_minus = $rm + 1;
-                            }
-                        }
-                    ?>
+foreach($hasil_plus as $i=>$r){
 
-                    <tr align="center">
+$rank_plus[
+$r['nama']
+]=$i+1;
 
-                        <td>
-                            <?= $no++ ?>
-                        </td>
+}
 
-                        <td align="left">
 
-                            <?= $h['nama'] ?>
+$rank_minus=[];
 
-                        </td>
+foreach($hasil_minus as $i=>$r){
 
-                        <td>
+$rank_minus[
+$r['nama']
+]=$i+1;
 
-                            <?= number_format($h['nilai'],5) ?>
+}
 
-                        </td>
 
-                        <td>
 
-                            <span class="badge badge-primary">
+// mapping data +10
 
-                                <?= $ranking_awal ?>
+$data_plus=[];
 
-                            </span>
+foreach($hasil_plus as $h){
 
-                        </td>
+$data_plus[
+$h['nama']
+]=$h['nilai'];
 
-                        <td>
+}
 
-                            <?= number_format($hasil_plus[$i]['nilai'],5) ?>
 
-                        </td>
 
-                        <td>
+// mapping data -10
 
-                            <?php if($ranking_plus == $ranking_awal){ ?>
+$data_minus=[];
 
-                                <span class="badge badge-success">
+foreach($hasil_minus as $h){
 
-                                    <?= $ranking_plus ?>
+$data_minus[
+$h['nama']
+]=$h['nilai'];
 
-                                </span>
+}
 
-                            <?php } else { ?>
 
-                                <span class="badge badge-danger">
 
-                                    <?= $ranking_plus ?>
+foreach($hasil_awal as $h):
 
-                                </span>
+?>
 
-                            <?php } ?>
+<tr align="center">
 
-                        </td>
+<td><?= $no++ ?></td>
 
-                        <td>
+<td align="left">
 
-                            <?= number_format($hasil_minus[$i]['nilai'],5) ?>
+<?= $h['nama'] ?>
 
-                        </td>
+</td>
 
-                        <td>
+<td>
 
-                            <?php if($ranking_minus == $ranking_awal){ ?>
+<?= number_format($h['nilai'],5) ?>
 
-                                <span class="badge badge-success">
+</td>
 
-                                    <?= $ranking_minus ?>
+<td>
 
-                                </span>
+<span class="badge badge-primary">
 
-                            <?php } else { ?>
+<?= $rank_awal[$h['nama']] ?>
 
-                                <span class="badge badge-danger">
+</span>
 
-                                    <?= $ranking_minus ?>
+</td>
 
-                                </span>
+<td>
 
-                            <?php } ?>
+<?= number_format(
+$data_plus[$h['nama']],
+5
+) ?>
 
-                        </td>
+</td>
 
-                    </tr>
+<td>
 
-                    <?php endforeach; ?>
+<?php
+if(
+$rank_plus[$h['nama']]
+==
+$rank_awal[$h['nama']]
+){
+?>
 
-                </tbody>
+<span class="badge badge-success">
 
-            </table>
+<?= $rank_plus[$h['nama']] ?>
 
-        </div>
+</span>
 
-        <div class="alert alert-success mt-4 text-justify">
+<?php } else { ?>
 
-            <b>Kesimpulan Sensitivity Analysis:</b>
+<span class="badge badge-danger">
 
-            <br><br>
+<?= $rank_plus[$h['nama']] ?>
 
-            Pengujian sensitivity analysis dilakukan
-            dengan mengubah bobot kriteria utama
-            sebesar ±10%.
+</span>
 
-            Jika hasil ranking alternatif tidak berubah,
-            maka metode Hybrid AHP-WASPAS
-            dianggap memiliki tingkat stabilitas
-            dan robustness yang baik.
+<?php } ?>
 
-            <br><br>
+</td>
 
-            Berdasarkan hasil pengujian,
-            sistem mampu menghasilkan
-            rekomendasi yang konsisten
-            meskipun terjadi perubahan
-            bobot pada kriteria tertentu.
+<td>
 
-        </div>
+<?= number_format(
+$data_minus[$h['nama']],
+5
+) ?>
 
-    </div>
+</td>
+
+<td>
+
+<?php
+if(
+$rank_minus[$h['nama']]
+==
+$rank_awal[$h['nama']]
+){
+?>
+
+<span class="badge badge-success">
+
+<?= $rank_minus[$h['nama']] ?>
+
+</span>
+
+<?php } else { ?>
+
+<span class="badge badge-danger">
+
+<?= $rank_minus[$h['nama']] ?>
+
+</span>
+
+<?php } ?>
+
+</td>
+
+</tr>
+
+<?php endforeach;?>
+
+</tbody>
+
+</table>
+
+</div>
+
+
+<div class="alert alert-success mt-4">
+
+<b>Kesimpulan Sensitivity Analysis:</b>
+
+<br><br>
+
+Jika ranking tidak berubah
+maka sistem memiliki
+stabilitas yang baik.
+
+</div>
+
+</div>
 
 </div>
 
