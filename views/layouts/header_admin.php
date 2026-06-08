@@ -203,20 +203,6 @@ if($this->session->status !== ('Logged'))
 
         </li>
 
-        <!-- SENSITIVITY -->
-        <li class="nav-item <?php if($page=='Sensitivity'){echo 'active';} ?>">
-
-            <a class="nav-link"
-               href="<?= base_url('Perhitungan/sensitivity'); ?>">
-
-                <i class="fas fa-fw fa-chart-line"></i>
-
-                <span>Sensitivity Analysis</span>
-
-            </a>
-
-        </li>
-
         <?php endif; ?>
 
         <!-- USER LEVEL 2 -->
