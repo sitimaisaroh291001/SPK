@@ -44,8 +44,8 @@ if($this->session->status !== ('Logged'))
             background:
             linear-gradient(
                 180deg,
-                #2ECC71 10%,
-                #1DB954 100%
+                #1ce63e 10%,
+                #49b91d 100%
             ) !important;
         }
 

@@ -10,7 +10,7 @@
 
 <div class="alert alert-danger text-justify">
 
-    Bobot kriteria didapatkan dari perhitungan menggunakan metode <b>AHP</b>.
+    Bobot kriteria didapatkan dari perhitungan menggunakan metode<b>AHP</b>.
     Silahkan menuju ke halaman
 
     <a href="<?= base_url('Kriteria/prioritas') ?>" class="btn btn-info btn-sm">
