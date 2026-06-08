@@ -7,7 +7,7 @@
         <meta name="description" content="" />
         <meta name="author" content="" />
 
-        <title>Sistem Pendukung Keputusan Pemilihan Pondok Pesantren Tahfidz</title>
+        <title>Sistem Pendukung Keputusan Pemilihan Pondok Pesantren Tahfidz Dengan Metode AHP-WASPAS</title>
 
         <!-- Custom fonts for this template-->
         <link href="<?= base_url('assets/')?>vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css" />
@@ -79,7 +79,7 @@
                                             <div class="form-group">
                                                 <input required autocomplete="off" type="password" class="form-control form-control-user" id="exampleInputPassword" name="password" placeholder="Password" />
                                             </div>
-                                            <button name="submit" type="submit" class="btn btn-info btn-user btn-block"><i class="fas fa-fw fa-sign-in-alt mr-1"></i> Masuk</button>
+                                            <button name="submit" type="submit" class="btn btn-info btn-user btn-block"><i class="fas fa-fw fa-sign-in-alt mr-1"></i> Login</button>
                                         </form>
                                     </div>
                                 </div>
